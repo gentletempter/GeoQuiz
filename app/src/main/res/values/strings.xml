@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">GeoQuiz</string>
+    <string name="true_button">TRUE</string>
+    <string name="false_button">FALSE</string>
+    <string name="correct_toast">Correct!</string>
+    <string name="incorrect_toast">Incorrect!</string>
+    <string name="question_australia">Canberra is the capital of Australia</string>
+    <string name="question_mideast">Iraq is in the Mideast</string>
+    <string name="question_africa">Africa is north of Iraq</string>
+    <string name="question_americas">Columbus discovered America</string>
+    <string name="question_asia">Asia is larger than Russia</string>
+    <string name="next_button">Next</string>
+    <string name="prev_button">Prev</string>
+    <string name="warning_text">Are you sure you wont to do this?</string>
+    <string name="show_answer_button">Show answer</string>
+    <string name="cheat_button">Cheat!</string>
+    <string name="judgement_toast">Cheating is wrong.</string>
+</resources>
