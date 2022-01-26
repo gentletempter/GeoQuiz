@@ -10,11 +10,11 @@ class QuizViewModel : ViewModel() {
     var cheatsLeft = CHEATS_LIMIT
 
     private val questionBank = listOf(
-        Question(R.string.question_australia, true, false),
-        Question(R.string.question_africa, false, false),
-        Question(R.string.question_americas, true, false),
-        Question(R.string.question_asia, false, false),
-        Question(R.string.question_mideast, true, false)
+        Question(R.string.question_australia, answer = true, cheated = false),
+        Question(R.string.question_africa, answer = false, cheated = false),
+        Question(R.string.question_americas, answer = true, cheated = false),
+        Question(R.string.question_asia, answer = false, cheated = false),
+        Question(R.string.question_mideast, answer = true, cheated = false)
     )
 
     val currentQuestionAnswer: Boolean

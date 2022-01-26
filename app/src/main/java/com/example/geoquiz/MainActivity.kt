@@ -1,27 +1,19 @@
 package com.example.geoquiz
 
 import android.app.Activity
-import android.app.ActivityOptions
-import android.content.Context
-import android.content.Intent
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
-import android.view.Gravity
-import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.Toast.makeText
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
-private const val REQUEST_CODE_CHEAT = 0
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +27,18 @@ class MainActivity : AppCompatActivity() {
     private val quizViewModel: QuizViewModel by lazy {
         ViewModelProvider(this).get(QuizViewModel::class.java)
     }
+    private val startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data
+                quizViewModel.currentQuestionCheat =
+                    intent?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+                quizViewModel.cheatsLeft--
+                cheatsLeftTextView.text = quizViewModel.cheatsLeft.toString()
+                if (quizViewModel.cheatsLeft < 1) cheatButton.isEnabled = false
+                //handle
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,17 +70,11 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
 
-        cheatButton.setOnClickListener { view ->
+        cheatButton.setOnClickListener {
             if (quizViewModel.cheatsLeft > 0) {
                 val answerIsTrue = quizViewModel.currentQuestionAnswer
                 val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    val options =
-                        ActivityOptions.makeClipRevealAnimation(view, 0, 0, view.width, view.height)
-                    startActivityForResult(intent, REQUEST_CODE_CHEAT, options.toBundle())
-                } else {
-                    startActivityForResult(intent, REQUEST_CODE_CHEAT)
-                }
+                startForResult.launch(intent)
             }
         }
 
@@ -86,21 +84,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateQuestion()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != Activity.RESULT_OK) {
-            return
-        }
-
-        if (requestCode == REQUEST_CODE_CHEAT) {
-            quizViewModel.currentQuestionCheat =
-                data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
-            quizViewModel.cheatsLeft--
-            cheatsLeftTextView.text = quizViewModel.cheatsLeft.toString()
-            if (quizViewModel.cheatsLeft < 1) cheatButton.isEnabled = false
-        }
     }
 
     override fun onStart() {
