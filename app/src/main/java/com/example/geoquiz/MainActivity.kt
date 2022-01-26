@@ -1,8 +1,10 @@
 package com.example.geoquiz
 
 import android.app.Activity
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -26,9 +28,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
     private lateinit var nextButton: ImageButton
-    private lateinit var prevButton: ImageButton
     private lateinit var cheatButton: Button
     private lateinit var questionTextView: TextView
+    private lateinit var cheatsLeftTextView: TextView
 
     private val quizViewModel: QuizViewModel by lazy {
         ViewModelProvider(this).get(QuizViewModel::class.java)
@@ -45,9 +47,11 @@ class MainActivity : AppCompatActivity() {
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
-        prevButton = findViewById(R.id.prev_button)
         cheatButton = findViewById(R.id.cheat_button)
         questionTextView = findViewById(R.id.question_text_view)
+        cheatsLeftTextView = findViewById(R.id.cheats_left_text_view)
+
+        cheatsLeftTextView.text = quizViewModel.cheatsLeft.toString()
 
         trueButton.setOnClickListener {
             checkAnswer(true)
@@ -62,10 +66,18 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
 
-        cheatButton.setOnClickListener {
-            val answerIsTrue = quizViewModel.currentQuestionAnswer
-            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+        cheatButton.setOnClickListener { view ->
+            if (quizViewModel.cheatsLeft > 0) {
+                val answerIsTrue = quizViewModel.currentQuestionAnswer
+                val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val options =
+                        ActivityOptions.makeClipRevealAnimation(view, 0, 0, view.width, view.height)
+                    startActivityForResult(intent, REQUEST_CODE_CHEAT, options.toBundle())
+                } else {
+                    startActivityForResult(intent, REQUEST_CODE_CHEAT)
+                }
+            }
         }
 
         questionTextView.setOnClickListener {
@@ -85,6 +97,9 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_CHEAT) {
             quizViewModel.currentQuestionCheat =
                 data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+            quizViewModel.cheatsLeft--
+            cheatsLeftTextView.text = quizViewModel.cheatsLeft.toString()
+            if (quizViewModel.cheatsLeft < 1) cheatButton.isEnabled = false
         }
     }
 

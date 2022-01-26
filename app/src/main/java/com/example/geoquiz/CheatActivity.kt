@@ -3,6 +3,7 @@ package com.example.geoquiz
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,12 +13,13 @@ import androidx.lifecycle.ViewModelProvider
 
 const val EXTRA_ANSWER_SHOWN = "com.example.geoquiz.answer_shown"
 private const val EXTRA_ANSWER_IS_TRUE = "com.example.geoquiz.answer_is_true"
-private const val KEY_INDEX = "cheat"
+private const val KEY_INDEX = "com.example.geoquiz.cheat_index"
 
 class CheatActivity : AppCompatActivity() {
 
     private lateinit var answerTextView: TextView
     private lateinit var showAnswerButton: Button
+    private lateinit var sdkVersionTextView: TextView
     private var answerIsTrue = false
 
     private val cheatViewModel: CheatViewModel by lazy {
@@ -33,7 +35,10 @@ class CheatActivity : AppCompatActivity() {
         answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false)
         answerTextView = findViewById(R.id.answer_text_view)
         showAnswerButton = findViewById(R.id.show_answer_button)
+        sdkVersionTextView = findViewById(R.id.sdk_version_text_view)
         cheatViewModel.cheatAnswer = cheatAnswer
+
+        "API Level ${Build.VERSION.SDK_INT}".also { sdkVersionTextView.text = it }
 
         showAnswerButton.setOnClickListener {
             val answerText = when {

@@ -2,9 +2,12 @@ package com.example.geoquiz
 
 import androidx.lifecycle.ViewModel
 
+private const val CHEATS_LIMIT = 3
+
 class QuizViewModel : ViewModel() {
 
     var currentIndex = 0
+    var cheatsLeft = CHEATS_LIMIT
 
     private val questionBank = listOf(
         Question(R.string.question_australia, true, false),
